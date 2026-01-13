@@ -3,7 +3,7 @@ import express from "express"
 const router = express.Router()
 // SignUp, Login LogOut section
 //   SignUp
-router.get("/singup", (req, res) => {
+router.get("/signup", (req, res) => {
   res.send("SignUp endpoint");
 });
 

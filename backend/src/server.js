@@ -4,14 +4,20 @@ import dotenv from "dotenv"
 import authRoutes from "./routes/auth.route.js"
 import masageRoutes from "./routes/masage.route.js";
 import path from "path"
+import { connetDB } from "./lib/db.js";
+import validator from "validator";
 const app = express(); 
 dotenv.config()
 
 const __dirname = path.resolve()
 
 const PORT = process.env.PORT || 3000
+
+
 // console.log(process.env.PORT)
-    
+app.use(express.json()) // req.body
+
+
 app.use("/api/auth", authRoutes);
 app.use("/api/massages", masageRoutes);
 // make ready for deployment 
@@ -36,5 +42,7 @@ if(process.env.NODE_ENV ==="production"){
 
 
 app.listen(PORT, ()=>{
-    console.log("서버가 정상 작동 중입니다: " , PORT)
+    console.log("서버가 정상 작동 중입니다: " , PORT);
+
+    connetDB();
 })

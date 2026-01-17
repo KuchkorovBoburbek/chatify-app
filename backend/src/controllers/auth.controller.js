@@ -1,0 +1,59 @@
+import validator from "validator";
+import User from "../models/user.js"
+import bcrypt from "bcryptjs";
+import {generateToken} from '../lib/utils.js'
+
+export const signup = async (req, res) => {
+  const { fullName, email, password } = req.body;
+  const name = typeof fullName === "string" ? fullName.trim() : "";
+  const normalizeEmail = typeof email === "string" ? email.trim().toLowerCase(): "";
+  const pass = typeof password === "string" ? password : ""; 
+
+  try {
+    if (!name || !normalizeEmail || !pass) {
+      return res.status(400).json({ massage: "All fields are required" });
+    }
+    if (pass.length < 6) {
+      return res
+        .status(400)
+        .json({ massage: "Password must be at least 6 charters " });
+    }
+    if (!validator.isEmail(normalizeEmail)) {
+      return res.status(400).json({ massage: "Invalid email format" });
+    }
+     
+    const existing = await User.findOne({ email: normalizeEmail });
+    if (existing) {
+      return res.status(409).json({ massage: "Email alredy exists" });
+    }
+
+    // 123456 => $liskdjf_?dsldkjf
+    const salt = await bcrypt.genSalt(10)
+    const hashedPassword = await bcrypt.hash(pass,salt)
+
+    const newUser = new User({
+      fullName: name,
+      email: normalizeEmail,
+      password: hashedPassword,
+    });
+
+    if(newUser){
+      const savedUser = await newUser.save();
+      generateToken(savedUser._id, res);
+
+      res.status(201).json({
+         _id: newUser._id,
+         fullName: newUser.fullName,
+         email: newUser.email,
+         profilePic: newUser.profilePic,
+      })
+     // todo: send a welcome email to user 
+
+    }else{
+        res.status(400).json({massage: "Invalid user data"})
+    }
+  } catch (error) {
+    console.log("Error in signup controller", error);
+    res.status(500).json({massage: "Internal servfer error"})
+  }
+};

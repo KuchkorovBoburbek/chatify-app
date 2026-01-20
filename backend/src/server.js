@@ -6,7 +6,7 @@ import path from "path"
 import { connetDB } from "./lib/db.js";
 import { ENV } from "./lib/env.js";
 const app = express(); 
-
+import cookieParser from "cookie-parser";
 
 const __dirname = path.resolve()
 
@@ -15,6 +15,7 @@ const PORT = ENV.PORT || 3000;
 
 // console.log(process.env.PORT)
 app.use(express.json()) // req.body
+app.use(cookieParser())
 
 
 app.use("/api/auth", authRoutes);

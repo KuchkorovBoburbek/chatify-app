@@ -5,6 +5,7 @@ import {generateToken} from '../lib/utils.js'
 import { sendWelcomeEmail } from "../emails/emailHandlers.js";
 
 import { ENV } from "../lib/env.js";
+import cloudinary from "../lib/cloudinary.js";
 
 // < signup logic   
 export const signup = async (req, res) => {
@@ -39,6 +40,7 @@ export const signup = async (req, res) => {
       fullName: name,
       email: normalizeEmail,
       password: hashedPassword,
+      
     });
 
     if(newUser){
@@ -105,8 +107,6 @@ export const login = async (req, res) => {
        res.status(500).json({ massage: "Internal server Error" });
      }
 }
-
-
 //login logic > 
 
 // < logout logic
@@ -115,4 +115,24 @@ export const logout = async (_, res) => {
   res.status(200).json({massage: "Logged out successfully"})
 }
 //logout logic >
+
+export const updateProfile = async (req, res) => {
+   
+   try {
+    const {profilePic} = req.body;
+    if(!profilePic) return res.status(400).json({massage: "Profile pic is required"});
+
+    const userId = req.user._id
+
+   const uploadResponse =  await cloudinary.uploader.upload(profilePic)
+
+   const updatedUser = await User.findByIdAndUpdate(userId, {profilePic: uploadResponse.secure_url}, {new:true}).select("-password")
+   
+   res.status(200).json(updatedUser);
+   } catch (error) {
+    console.log("Error in update profile: ", error);
+    res.status(500).json({massage: "Internal server Error"})
+   }
+
+};
 

@@ -6,7 +6,7 @@ import { sendWelcomeEmail } from "../emails/emailHandlers.js";
 
 import { ENV } from "../lib/env.js";
 
-
+// < signup logic   
 export const signup = async (req, res) => {
   const { fullName, email, password } = req.body;
   const name = typeof fullName === "string" ? fullName.trim() : "";
@@ -69,3 +69,50 @@ export const signup = async (req, res) => {
     res.status(500).json({massage: "Internal servfer error"})
   }
 };
+// signup logic > 
+
+// < login logic
+export const login = async (req, res) => {
+   const {email, password} = req.body;
+
+   if (!email || !password) {
+    return res.status(400).json({massage: "Email and password are required"})
+   }
+     try {
+       const user = await User.findOne({ email });
+       if (!user)
+         return res
+           .status(400)
+           .json({ massage: "Invalid credentials (email)" });
+       //never tell the client which one is incorrect: password or email
+       console.log("first");
+       const isPassworCorrect = await bcrypt.compare(password, user.password);
+       if (!isPassworCorrect)
+         return res
+           .status(400)
+           .json({ massage: "Invalid credentials (password)" });
+       console.log("first2");
+       generateToken(user._id, res);
+
+       res.status(200).json({
+         _id: user._id,
+         fullName: user.fullName,
+         email: user.email,
+         profilePic: user.profilePic,
+       });
+     } catch (error) {
+       console.error("Error in logic controller: ", error);
+       res.status(500).json({ massage: "Internal server Error" });
+     }
+}
+
+
+//login logic > 
+
+// < logout logic
+export const logout = async (_, res) => {
+  res.cookie("jwt", "", {maxAge:0})
+  res.status(200).json({massage: "Logged out successfully"})
+}
+//logout logic >
+

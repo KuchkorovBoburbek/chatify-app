@@ -1,0 +1,103 @@
+import Message from "../models/Message.js";
+import User from "../models/user.js";
+import cloudinary from "../lib/cloudinary.js"
+
+export const getAllContacts = async(req, res)=>{
+    try {
+        const loggedInUserId = req.user._id;
+        const filteredUsers = await User.find({_id: {$ne: loggedInUserId}}).select("-password");
+        res.status(200).json(filteredUsers);
+    } catch (error) {
+        console.log("Error in getAllContacts: ", error);
+        res.status(500).json({message: "Server error"})
+    }
+}
+
+
+export const getMessageByUserId = async(req, res) =>{
+    try {
+        const myId = req.user._id;
+        const{id:userToChatId}= req.params
+
+        const messages = await Message.find({
+            $or: [
+                {senderId: myId, receiverId: userToChatId},
+                {senderId: userToChatId, receiverId: myId}
+            ]
+        });
+
+        res.status(200).json(messages)
+    } catch (error) {
+        console.log("Error getMessages controller: ", error.message);
+        res.status(500).json({error: "Internal server Error"});
+
+    }
+}
+
+export const sendMessage = async(req, res) => {
+    try {
+      const { text, image } = req.body;
+      const { id: receiverId } = req.params;
+      const senderId = req.user._id; // ✅ SHU YETISHMAYOTGANDI
+       if(!text && !image){
+        return res.status(400).json({message: "Text or image is required"})
+       }
+        if (senderId.equals(receiverId)) {
+          return res.status(400).json({ message: "Cannot send messages to yourself" });
+        }
+        const receiverExists = await User.exists({_id:receiverId});
+        if(!receiverExists){
+            return res.status.json({message: "Resiver not found"})
+        }
+
+      let imageUrl;
+      if (image) {
+        //uplode base64 image to cloudinary
+        const uploadResponse = await cloudinary.uploader.upload(image);
+        imageUrl = uploadResponse.secure_url;
+      }
+      console.log("Birinchibu yerdan otti");
+      const newMessage = new Message({
+        senderId,
+        receiverId,
+        text,
+        image: imageUrl,
+      });
+      console.log("bu yerdan otti");
+      await newMessage.save();
+      res.status(201).json(newMessage);
+
+      // todo: send message in real-time if user is online -socket.io
+    } catch (error) {
+        console.log("Error getMessages controller: ", error.message);
+        res.status(500).json({ error: "Internal server Error" });
+    }
+} 
+
+export const getChatPartners = async(req, res)=>{
+    try {
+        const loggedInUserId = req.user._id;
+        console.log(loggedInUserId);
+console.log("chatsga sorov keldi ")
+        //find all the massages where the logged-in user is either sender or receiver
+        const messages = await Message.find({
+            $or: [{senderId: loggedInUserId}, {receiverId: loggedInUserId}]
+        });
+        console.log("chatsga sorov bu yerga keldi ");
+        const chatPartnerIds = [
+          ...new Set(messages.map((msg) => 
+              msg.senderId.toString() === loggedInUserId.toString()
+                ? msg.receiverId.toString()
+                : msg.senderId.toString()))
+            ];
+console.log("chatsga sorov bu yerga ham  keldi ");
+        const chatPartners = await User.find({_id: {$in: chatPartnerIds}}).select("-password")
+console.log(chatPartners);
+        res.status(200).json(chatPartners)
+console.log("chatsga sorov bu yerga ham vanihyoyat keldi ");
+
+    } catch (error) {
+        console.log("Error getMessages controller: ", error.message);
+        res.status(500).json({ error: "Internal server Error" });
+    }
+}

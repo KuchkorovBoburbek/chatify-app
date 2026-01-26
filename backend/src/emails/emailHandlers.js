@@ -3,11 +3,15 @@ import { createWelcomeEmailTemplate } from "./emailTemplate.js";
 
 
 export const sendWelcomeEmail = async (email, name, clientURL  ) => {
-    const {data, error} =await resentClient.emails.send({
-        from : `${sender.name}  <${sender.email}>`,
-        to : email,
-        subject : "Welcome to Chatify",
-        html: createWelcomeEmailTemplate(name, clientURL)
+    const { data, error } = await resentClient.emails.send({
+      // from : `${sender.name}  <${sender.email}>`,
+      // to : email,
+      // domain olinmagan bolsa faqat ozimni emailimga jonata olaman
+      // shuning uchun vaqtinchalik develop uchun
+      from: "onboarding@resend.dev",
+      to: "bekkr0321@gmail.com",
+      subject: "Welcome to Chatify",
+      html: createWelcomeEmailTemplate(name, clientURL),
     });
 
     if(error) {

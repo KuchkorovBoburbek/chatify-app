@@ -2,10 +2,12 @@
 import { create } from "zustand"; //Zustand — React uchun yengil state manager
 import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
+import { Annoyed } from "lucide-react";
 export const useAuthStore = create((set) => ({
   authUser: null,
   isCheckingAuth: true,
   isSigningUp: false,
+  isLoggingIn: false, 
 
   checkAuth: async () => {
     try {
@@ -35,5 +37,33 @@ export const useAuthStore = create((set) => ({
      } finally{
     set({ isSigningUp: false });
      }
+  },
+
+
+    login: async (data)=>{
+    set({ isLoggingIn: true });
+     try {
+      const res = await axiosInstance.post("auth/login", data)
+      set({authUser: res.data});
+
+      toast.success("Logged in  successfully");
+     } catch (error) {
+      toast.error(error.response.data.message)
+     } finally{
+    set({ isLoggingIn: false });
+     }
+  }, 
+
+  logout: async(data)=>{
+    try {
+      await axiosInstance.post("/auth/logout");
+      set({authUser: null});
+      console.log("Logged out successfully");
+      toast.success("Logged out successfully")
+    } catch (error) {
+      toast.success("Error logging out");
+      console.log("Logput error:", error)
+    }
   }
 }));
+

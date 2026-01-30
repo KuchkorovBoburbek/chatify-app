@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import BorderAnimatedContainer from "../components/BorderAnimatedContainer";
-import {  MailIcon, MessageCircleCodeIcon, UserIcon } from "lucide-react";
+import {  LockIcon, MailIcon, MessageCircleCodeIcon, UserIcon } from "lucide-react";
 import { LoaderIcon } from "react-hot-toast";
 import { Link } from "react-router";
 
@@ -65,7 +65,7 @@ function SignUpPage() {
                           setFormData({ ...formData, email: e.target.value })
                         }
                         className="input"
-                        placeholder="markboburbek@gmail.com"
+                        placeholder="mark@gmail.com"
                       />
                     </div>
                   </div>
@@ -74,7 +74,7 @@ function SignUpPage() {
                   <div className="">
                     <label className="auth-label ">Password</label>
                     <div className="relative">
-                      <MailIcon className="auth-input-icon" />
+                      <LockIcon className="auth-input-icon" />
                       <input
                         type="password"
                         value={formData.password}

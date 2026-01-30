@@ -13,11 +13,9 @@ const router = express.Router()
 // 서버 자원을 아끼는 구조다 
 router.use(arcjetProtection, protectRoute);
 
-router.get("/contacts",  getAllContacts);
+router.get("/contacts", getAllContacts);
 router.get("/chats", getChatPartners);
 router.get("/:id", getMessageByUserId);
 router.post("/send/:id", sendMessage);
-
-
 
 export default router;

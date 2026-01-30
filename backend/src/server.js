@@ -7,7 +7,7 @@ import { connetDB } from "./lib/db.js";
 import { ENV } from "./lib/env.js";
 const app = express(); 
 import cookieParser from "cookie-parser";
-
+import cors from "cors"
 const __dirname = path.resolve()
 
 const PORT = ENV.PORT || 3000;
@@ -15,6 +15,7 @@ const PORT = ENV.PORT || 3000;
 
 // console.log(process.env.PORT)
 app.use(express.json()) // req.body
+app.use(cors({origin: ENV.CLIENT_URL, credentials: true}))
 app.use(cookieParser())
 
 

@@ -10,7 +10,7 @@ import arcjet from "@arcjet/node";
 import { arcjetProtection } from "../middleware/arcjet.middleware.js";
 const router = express.Router();
 
-router.use(arcjetProtection);
+router.use(arcjetProtection); 
 // bu yerda kelayotgan hamma reqlar arcjetProtection tekshiruvidaan otadi va uni ichidagi next() ishlaydi yani keyingi qatorga otqazadi
 // SignUp, Login LogOut section
 //   SignUp

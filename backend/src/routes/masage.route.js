@@ -11,7 +11,8 @@ const router = express.Router()
 //요청을 너무 많이 보내는 사람은
 // 로그인 확인 전에 먼저 막아서
 // 서버 자원을 아끼는 구조다 
-router.use(arcjetProtection, protectRoute);
+router.use(arcjetProtection, protectRoute); 
+
 
 router.get("/contacts", getAllContacts);
 router.get("/chats", getChatPartners);

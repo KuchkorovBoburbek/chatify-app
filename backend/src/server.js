@@ -13,14 +13,23 @@ const __dirname = path.resolve()
 const PORT = ENV.PORT || 3000;
 
 
-// console.log(process.env.PORT)
-app.use(express.json()) // req.body
+// console.log(process.env.PORT) 
+
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  }),
+);
+app.use(express.json({ limit: "10mb" }));
+ // req.body
 app.use(cors({origin: ENV.CLIENT_URL, credentials: true}))
 app.use(cookieParser())
+app.use(express.urlencoded({ limit: "10mb", extended: true }));
 
 
 app.use("/api/auth", authRoutes);
-app.use("/api/massages", masageRoutes);
+app.use("/api/messages", masageRoutes);
 // make ready for deployment 
 if (ENV.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../frontend/dist")));

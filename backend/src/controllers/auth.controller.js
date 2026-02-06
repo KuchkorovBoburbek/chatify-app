@@ -16,20 +16,20 @@ export const signup = async (req, res) => {
 
   try {
     if (!name || !normalizeEmail || !pass) {
-      return res.status(400).json({ massage: "All fields are required" });
+      return res.status(400).json({ message: "All fields are required" });
     }
     if (pass.length < 6) {
       return res
         .status(400)
-        .json({ massage: "Password must be at least 6 charters " });
+        .json({ message: "Password must be at least 6 charters " });
     }
     if (!validator.isEmail(normalizeEmail)) {
-      return res.status(400).json({ massage: "Invalid email format" });
+      return res.status(400).json({ message: "Invalid email format" });
     }
      
     const existing = await User.findOne({ email: normalizeEmail });
     if (existing) {
-      return res.status(409).json({ massage: "Email alredy exists" });
+      return res.status(409).json({ message: "Email alredy exists" });
     }
 
     // 123456 => $liskdjf_?dsldkjf
@@ -64,11 +64,11 @@ export const signup = async (req, res) => {
         console.log("Failed to send welcome email")
        }
     }else{
-        res.status(400).json({massage: "Invalid user data", error})
+        res.status(400).json({ message: "Invalid user data", error });
     }
   } catch (error) {
     console.log("Error in signup controller", error);
-    res.status(500).json({massage: "Internal servfer error"})
+    res.status(500).json({ message: "Internal servfer error" });
   }
 };
 // signup logic > 
@@ -78,21 +78,21 @@ export const login = async (req, res) => {
    const {email, password} = req.body;
 
    if (!email || !password) {
-    return res.status(400).json({massage: "Email and password are required"})
+    return res.status(400).json({ message: "Email and password are required" });
    }
      try {
        const user = await User.findOne({ email });
        if (!user)
          return res
            .status(400)
-           .json({ massage: "Invalid credentials (email)" });
+           .json({ message: "Invalid credentials (email)" });
        //never tell the client which one is incorrect: password or email
        console.log("first");
        const isPassworCorrect = await bcrypt.compare(password, user.password);
        if (!isPassworCorrect)
          return res
            .status(400)
-           .json({ massage: "Invalid credentials (password)" });
+           .json({ message: "Invalid credentials (password)" });
        console.log("first2");
        generateToken(user._id, res);
 
@@ -104,7 +104,7 @@ export const login = async (req, res) => {
        });
      } catch (error) {
        console.error("Error in logic controller: ", error);
-       res.status(500).json({ massage: "Internal server Error" });
+       res.status(500).json({ message: "Internal server Error" });
      }
 }
 //login logic > 
@@ -113,7 +113,7 @@ export const login = async (req, res) => {
 export const logout = async (_, res) => {
   res.cookie("jwt", "", {maxAge:0}) 
   console.log("Logged out successfully");
-  res.status(200).json({massage: "Logged out successfully"})
+  res.status(200).json({ message: "Logged out successfully" });
 }
 //logout logic >
 
@@ -121,7 +121,7 @@ export const updateProfile = async (req, res) => {
    
    try {
     const {profilePic} = req.body;
-    if(!profilePic) return res.status(400).json({massage: "Profile pic is required"});
+    if(!profilePic) return res.status(400).json({ message: "Profile pic is required" });
 
     const userId = req.user._id
 
@@ -132,7 +132,7 @@ export const updateProfile = async (req, res) => {
    res.status(200).json(updatedUser);
    } catch (error) {
     console.log("Error in update profile: ", error);
-    res.status(500).json({massage: "Internal server Error"})
+    res.status(500).json({ message: "Internal server Error" });
    }
 
 };

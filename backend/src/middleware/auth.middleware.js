@@ -6,18 +6,24 @@ import {ENV} from "../lib/env.js"
 export const protectRoute = async(req, res, next)=>{
   try {
     const token = req.cookies.jwt
-    if(!token) return res.status(401).json({massage: "Unauthorized - No token provided"}) ;
+    if(!token) return res
+      .status(401)
+      .json({ message: "Unauthorized - No token provided" });
 
     const decoded = jwt.verify(token, ENV.JWT_SECRET)
-    if(!decoded) return res.status(401).json({ massage: "Unauthorized - Invalid token provided" });
+    if(!decoded) return res
+      .status(401)
+      .json({ message: "Unauthorized - Invalid token provided" });
 
     const user = await User.findById(decoded.userId).select("-password")
-    if(!user) return res.status(404).json({massage: "User not found"})
+    if(!user) return res.status(404).json({ message: "User not found" });
     
     req.user = user
     next()    
   } catch (error) {
     console.log("Eror in protectRoute middleware", error)
-    res.status(500).json({massage: "Internal server error (Update profile logic)"})
+    res
+      .status(500)
+      .json({ message: "Internal server error (Update profile logic)" });
   }
 }

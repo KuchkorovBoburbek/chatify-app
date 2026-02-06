@@ -76,26 +76,30 @@ export const sendMessage = async(req, res) => {
 
 export const  getChatPartners = async(req, res)=>{
     try {
-        const loggedInUserId = req.user._id;
-        console.log(loggedInUserId);
-console.log("chatsga sorov keldi ")
-        //find all the massages where the logged-in user is either sender or receiver
-        const messages = await Message.find({
-            $or: [{senderId: loggedInUserId}, {receiverId: loggedInUserId}]
-        });
-        console.log("chatsga sorov bu yerga keldi ");
-        const chatPartnerIds = [
-          ...new Set(messages.map((msg) => 
-              msg.senderId.toString() === loggedInUserId.toString()
-                ? msg.receiverId.toString()
-                : msg.senderId.toString()))
-            ];
-console.log("chatsga sorov bu yerga ham  keldi ");
-        const chatPartners = await User.find({_id: {$in: chatPartnerIds}}).select("-password")
-console.log(chatPartners);
-        res.status(200).json(chatPartners)
-console.log("chatsga sorov bu yerga ham vanihyoyat keldi ");
-
+      const loggedInUserId = req.user._id;
+      console.log(loggedInUserId);
+      console.log("chatsga sorov keldi ");
+      //find all the messages where the logged-in user is either sender or receiver
+      const messages = await Message.find({
+        $or: [{ senderId: loggedInUserId }, { receiverId: loggedInUserId }],
+      });
+      console.log("chatsga sorov bu yerga keldi ");
+      const chatPartnerIds = [
+        ...new Set(
+          messages.map((msg) =>
+            msg.senderId.toString() === loggedInUserId.toString()
+              ? msg.receiverId.toString()
+              : msg.senderId.toString(),
+          ),
+        ),
+      ];
+      console.log("chatsga sorov bu yerga ham  keldi ");
+      const chatPartners = await User.find({
+        _id: { $in: chatPartnerIds },
+      }).select("-password");
+      console.log(chatPartners);
+      res.status(200).json(chatPartners);
+      console.log("chatsga sorov bu yerga ham vanihyoyat keldi ");
     } catch (error) {
         console.log("Error getMessages controller: ", error.message);
         res.status(500).json({ error: "Internal server Error" });

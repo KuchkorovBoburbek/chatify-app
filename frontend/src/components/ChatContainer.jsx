@@ -1,16 +1,23 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { useChatStore } from '../store/useChatStore';
 import { useAuthStore } from '../store/useAuthStore';
 import ChatHeader from './ChatHeader';
 import NoChatHistoryPlaceholder from './NoChatHistoryPlaceholder';
 import MessageInput from './MessageInput';
 import MessageLoadingSkeleton from './MessageLoadingSkeleton';
+
+
 function ChatContainer() {
   const { selectedUser, getMessagesByUserId, messages, isMessagesLoading } =
     useChatStore();
   const { authUser } = useAuthStore();
-  
-
+  const messageEndRef = useRef(null)
+   
+  useEffect(()=>{
+    if(messageEndRef.current){
+      messageEndRef.current.scrollIntoView({behavior: "smooth"})
+    }
+  }, [messages])
 
   useEffect(() => {
     getMessagesByUserId(selectedUser._id);
@@ -38,11 +45,12 @@ function ChatContainer() {
                   )}
                   {msg.text && <p className="mt-2">{msg.text}</p>}
                   <p className="text-xs mt-1 opacity-75 flex items-center gap-1">
-                    {new Date(msg.createdAt).toLocaleDateString([], {hour: "2-digit", minute: "2-digit"})}
+                    {new Date(msg.createdAt).toLocaleTimeString(undefined, {hour: "2-digit", minute: "2-digit"})}
                   </p>
                 </div>
               </div>
             ))}
+            <div ref={messageEndRef}/>
           </div>
         ) : isMessagesLoading ? <MessageLoadingSkeleton/> :  (
           <NoChatHistoryPlaceholder name={selectedUser.fullName} />
